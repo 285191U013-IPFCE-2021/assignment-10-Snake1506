@@ -6,117 +6,108 @@
 #include<stdbool.h>
 
 
+int find_min_of_right (struct tree_node *t)
+{
+  struct tree_node * temp = t;
+      while (t -> left != NULL)
+      {
+        temp = t -> left;
+      }
+  return temp -> item;
+} 
+
 struct tree_node * Insert (int x, struct tree_node *t)
 {
-  // Insert item x into the tree t
-  if (t == NULL){
-      t = Initialize(t);
-      t->item = x;
-  }
-  else if (x <= t->item)
-    return (Insert(x, t->left));
-  else
-    return (Insert(x, t->right));
 
-  return (t);
+  struct tree_node * new_x = malloc(sizeof(struct tree_node));
+
+  new_x -> item = x;
+  new_x -> right = NULL;
+  new_x -> left = NULL;
+
+  if (t == NULL) //if the tree is empty, we just return the new tree with the value x. 
+    return new_x;
+  
+  if (x > t -> item)
+    t -> right = Insert(x , t -> right); //recursive step, when x is larger than the knot.
+  else 
+    t -> left = Insert(x , t -> left); //recursive step, when x is smaller than the knot. 
+
+  return t; //returns the tree with item x now in it. 
 }
-
-
-struct tree_node* minVal(struct tree_node* t) 
-{
-  /* Retun the node with minmum value found in the tree.*/
-  struct tree_node* current = t;
-
-  // loop down to find the leftmodst leaf
-  while (current && current->left != NULL)
-    current = current->left;
-
-  return current;
-}
-
-
 
 struct tree_node * Remove (int x, struct tree_node *t)
 {
- // Remove one item from the tree t
-
- // base case
-  if (t == NULL)
-    return (t);
-
-  struct tree_node* p = t;
-  
-  //find if the item that is gater or smuller then the node
-  if (x < t->item)
-    t->left = Remove(x, t->left);
-  else if (x > t->item)
-    t->right = Remove(x, t->right);
-  
-  else // when x = t->item
-  {
-    // node with only one child or no child
-    if (t->right == NULL)
-    {
-      p = t->right;
-      free(t);
-      return p;
-    }
-    else if (t->left == NULL)
-    {
-      p = t->left;
-      free(t);
-      return (p);
-    }
-    
-    //node with two children:
-    struct tree_node* prev = minVal(t->right);
-
-    t->item = p->item;
-
-    t->right = Remove(t->item, t->right);
-
+  if (t == NULL) //if the tree is empty, we return the empty tree. 
     return t;
-  }
-}
 
+  if (x > t->item) 
+    {
+      t -> right = Remove (x , t -> right); //the function is called recursively, by going either left or right through the branches
+    }                                       //until we end up on the x we are searching for. 
+  else if (x < t -> item)
+    {
+      t -> left = Remove (x , t -> left);
+    }
+  else if (t -> left == NULL && t -> right == NULL) //if the knot with the x-value we are looking to remove, doesn't have any children
+    {                                               //we can just free the node, and return the updated tree. 
+      free(t);
+      return NULL;
+    }
+     else if (t->right == NULL || t->left == NULL)
+              {
+                struct tree_node * temp_t = NULL;
+                if (t -> right == NULL)
+                {
+                  temp_t = t -> left;
+                }
+                else if (t -> left == NULL)
+                  temp_t = t -> right;
+                free (t);
+                return temp_t;
+              } 
+     else 
+      {
+        int min_largest = find_min_of_right (t->right); //function find_min_of_right is used to change the value of t->item to the 
+        t -> item = min_largest;                        //the replacement value, and then we recursively remove the node from which 
+        t -> right = Remove(t -> item, t -> right);     //borrowed the value. 
+      }
+  return t;
+}
 
 int Contains (int x, struct tree_node *t)
 {
-
-  // Return true if the tree t contains item x. Return false otherwise.
-  if (x == t->item)
+  if (t == NULL) //firstly we check if the tree is empty
+    return 0;
+    
+  if (t->item == x) //base case 
     return 1;
-  else if (x < t->item)
+  else if (x < t->item)         //recursive step: is x smaller than current item? else check "left child"
     return Contains(x, t->left);
-  else if (x > t->item)
+  else              //recursive step: is x larger than current item? else check "right child"
     return Contains(x, t->right);
-  else
-  return 0;
+  // Return true if the tree t contains item x. Return false otherwise.
 
 }
 
-
 struct tree_node * Initialize (struct tree_node *t)
 {
-  // Create an empty tree
-  struct tree_node *p = malloc(sizeof(struct tree_node));
-  p->left = NULL;
-  p->right = NULL;
+  t = NULL;
 
-  return p;
+  return t;
 }
 
 int Empty (struct tree_node *t)
 {
-  // Test if empty
+  // if there is no tree (if it is empty), we should return true. Else we return false (0)
   if (t == NULL)
     return 1;
   else
-      return 0;
+    return 0;
 }
 
 int Full (struct tree_node *t)
 {
-    // Test if full
-    return false;
+    // a tree cannot be full, so we should always return false (or in this case 0 because we have an integer as return type)
+    return 0;
 }

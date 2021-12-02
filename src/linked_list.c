@@ -13,65 +13,61 @@ node *make_node (int v, node * q)
   node *p = malloc (sizeof (node));
   p->value = v;
 
-  if (q == &SENTINEL_node)
-    p->next = &SENTINEL_node;
+  if (q == NULL)
+    p->next = NULL;
   else
     p->next = q;
   return p;
 }
 
 /* free all nodes in the list p */
-void free_list (node * p)
+node * free_list (node * p)
 {
   node *q = p;
-  while (q != &SENTINEL_node)
+  while (q != NULL)
     {
       node *t = q->next;
       free (q);
       q = t;
     }
+  return q;
 }
-
 
 /* print list to console */
 void print_list (node * p)
 {
-    // Add your code for exercise 1
-    // There is NO testcode for this
+  node *current_node = p; //local pointer equal to the linked list pointer p.  
 
-      if (p->next != &SENTINEL_node){
-        printf("%d", p->value);
-        print_list(p->next);
-      }
-      else
-        printf("%d, ", p->value);
-      
-      
+    if (current_node->next == NULL) //base case
+    {
+        printf("%d\n", current_node->value);
     }
-
-    
-    
+    else //recursive step
+    {
+      printf("%d\n", current_node->value);
+      print_list(current_node->next);
+    }
+}
 
 int sum_squares (node * p)
 {
-    // Add your code for excercise 2
-    // You can find the tests in tests.cpp
 
-    if (p->next != &SENTINEL_node)
-      return (square(p->value)+ sum_squares(p->next));
-    else 
-      return square(p->value);
+  if (p == NULL)
+    return 0;
+  else if (p->next == NULL)
+    return square(p->value); //base case
+  else
+    return sum_squares(p->next)+square(p->value); //recursive step
 }
 
 node *map (node * p, int (*f) (int))
 {
-    // Add your code for excercise 3
-    if (p->next != &SENTINEL_node)
-      return map(p->next, square);
-    else 
-     return map(p->next, square);
+  if (p == NULL)
+    return p; // base case
+  else 
+    return make_node((*f)(p->value), map(p->next,f)); //recursive step. Calls "square function" to p->value and uses recursion 
+                                                      //fill out the rest of the tree 
 }
-
 
 int square (int x)
 {
